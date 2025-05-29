@@ -4,6 +4,7 @@ import productsRouter from "./routes/products.route.js";
 import cartRouter from "./routes/cart.route.js";
 import orderRouter from "./routes/order.route.js";
 import userRouter from "./routes/user.route.js";
+import fs from "fs";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yaml";
 import { dbconnect } from "./config/db.js";
@@ -19,7 +20,7 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
 
-const file = fs.readFileSync("./src/docs.yaml", "utf8");
+const file = fs.readFileSync("./docs.yaml", "utf8");
 const swaggerDocument = YAML.parse(file);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
