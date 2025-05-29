@@ -14,11 +14,12 @@ export const ShowAllProducts = async (req, res) => {
     }
 }
 // To get product by id
-export const GetOneProduct = async (req, res, next) => {
+export const GetOneProduct = async (req, res) => {
     const {params: id} = req
     try{
         const product = await Product.findOne({_id:id.id})
         if (!product) return res.status(404).json({message: "Product not found"})
+        res.status(201).json(product)
 
     } catch (err){
        console.error(err)

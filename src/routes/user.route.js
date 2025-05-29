@@ -4,9 +4,9 @@ import { GetAddress, AddNewAddress, updateUserProfile, DeleteAddress, GetUserpro
 const router = Router();
 
 router.get("/:id", GetUserprofile);
-router.get("/addresses", GetAddress);
+router.get("/addresses/:id", GetAddress);
 router.post("/addresses/:id", AddNewAddress);
-router.put("/", updateUserProfile);
+router.put("/:id", updateUserProfile);
 router.put("/addresses/:id", UpdateAddress);
 router.delete("/addresses/:id", DeleteAddress);
 

@@ -1,0 +1,774 @@
+# COSMIC API
+
+openapi: 3.1.0
+
+info:
+  title: FAMILY MANAGEMENT BACKEND
+  version: "1.2"
+
+servers:
+  - url: http://localhost:3000/
+
+tags:
+  - name: cosmic API
+    description: Perform some sort of operations on products etc
+
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - email
+        - password
+        - firstname
+        - lastname
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: StrongPassword123!
+        firstname:
+          type: string
+          example: John
+        lastname:
+          type: string
+          example: Doe
+        role:
+          type: string
+          enum: [user, admin]
+          default: user
+          example: user
+        addresses:
+          type: array
+          items:
+            type: object
+            properties:
+              street:
+                type: string
+                example: 123 Main St
+              city:
+                type: string
+                example: Yaoundé
+              state:
+                type: string
+                example: Centre
+              zipcode:
+                type: string
+                example: 10001
+              country:
+                type: string
+                example: Cameroon
+              isdefault:
+                type: boolean
+                example: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    Product:
+      type: object
+      required:
+        - name
+        - description
+        - price
+        - category
+      properties:
+        name:
+          type: string
+          example: "iPhone 14"
+        description:
+          type: string
+          example: "Latest iPhone model with improved battery life."
+        price:
+          type: number
+          format: float
+          example: 999.99
+        category:
+          type: string
+          example: "Electronics"
+        imageurl:
+          type: string
+          format: uri
+          example: "https://example.com/images/iphone14.jpg"
+        inventory:
+          type: integer
+          example: 20
+          default: 0
+        isActive:
+          type: boolean
+          default: true
+          example: true
+        features:
+          type: string
+          example: "128GB storage, A16 Bionic chip, Dual camera"
+        ratings:
+          type: array
+          items:
+            type: object
+            properties:
+              _id:
+                type: string
+                format: uuid
+                example: "60c72b2f9b1e8b35d8fefb01"
+              rating:
+                type: number
+                example: 4.5
+              review:
+                type: string
+                example: "Excellent product. Highly recommended!"
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    Order:
+      type: object
+      required:
+        - userid
+        - items
+        - totalamount
+      properties:
+        userid:
+          type: string
+          format: uuid
+          description: ID of the user who placed the order
+        items:
+          type: array
+          description: List of ordered products
+          items:
+            type: object
+            required:
+              - productid
+              - name
+              - quantity
+              - price
+            properties:
+              productid:
+                type: string
+                format: uuid
+                description: ID of the product
+              name:
+                type: string
+              quantity:
+                type: integer
+              price:
+                type: number
+                format: float
+        totalamount:
+          type: number
+          format: float
+        shippingaddress:
+          type: object
+          properties:
+            street:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            zipcode:
+              type: string
+            country:
+              type: string
+        status:
+          type: string
+          enum: [pending, processing, shipped, delivered, cancelled]
+          default: pending
+        paymentstatus:
+          type: string
+          enum: [pending, paid, failed]
+          default: pending
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+    Cart:
+      type: object
+      required:
+        - userid
+        - item
+      properties:
+        userid:
+          type: string
+          format: uuid
+          description: ID of the user who owns the cart
+        item:
+          type: array
+          items:
+            type: object
+            required:
+              - productid
+              - quantity
+              - price
+            properties:
+              productid:
+                type: string
+                format: uuid
+              quantity:
+                type: integer
+                minimum: 1
+              price:
+                type: number
+                format: float
+        totalamount:
+          type: number
+          format: float
+          default: 0
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+paths:
+  #products API
+  /api/products/:
+    get:
+      summary: This endpoint is to find all the products available in the store 
+      description: This endpoint is to find all the products available in the store
+      responses:
+        200:
+          description: products found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/product"
+        404:
+          description: Products not found
+        500: 
+          description: error
+    post:
+      summary: To add a product
+      description: To add a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/product"
+
+      responses:
+        201:
+          description: Succesfully added
+        500:
+          description: Bad request
+  /api/product/{id}:
+    get:
+      summary: One product
+      description: To find a particular product by it's id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID required
+          schema:
+            type: string
+      responses:
+        201:
+          description: available
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/products"
+        500:
+          description: Bad request
+        404:
+          description: Product not found
+  
+    
+
+  /api/products/{id}:
+    put:
+      summary: To update by Id
+      description: To update by Id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Numeric ID required
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/product"
+      responses:
+        200:
+          description: updated succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/product"
+        400:
+          description: Bad request
+      
+    delete:
+      summary: To get delete product by id
+      description: To get delete product by id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Numeric ID required
+          schema:
+            type: string
+      responses:
+        200:
+          description: product succesfull deleted
+
+        400:
+          description: failed to delete
+        404:
+          description: member not found
+  
+  /api/products/{id}/reviews:
+    put:
+      summary: To get users by Id
+      description: To get users by Id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Numeric ID required
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/product"
+      responses:
+        200:
+          description: updated succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/product"
+        400:
+          description: Bad request
+
+  #Authentication
+  /api/auth/register:
+    post:
+      summary: Use for registering users
+      description: Use for registering users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/User"
+
+      responses:
+        200:
+          description: User created, You can now login
+
+        400:
+          description: Bad request
+          
+  /api/auth/login:
+    post:
+      summary: Use for logging users
+      description: Use for logging users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/User"
+
+      responses:
+        200:
+          description: User logged in
+
+        400:
+          description: Bad request
+  
+  /api/users/me/{id}:
+    get:
+      summary: One product
+      description: To find a particular product by it's id
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID required
+          schema:
+            type: string
+      responses:
+        201:
+          description: user available
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/User"
+        500:
+          description: Bad request
+        404:
+          description: user not found
+    
+    put:
+      summary: update user info
+      description: update user profile
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Numeric ID required
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/User"
+      responses:
+        200:
+          description: updated succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/User"
+        400:
+          description: Bad request
+
+  /api/users/me/addresses/{id}:
+    get:
+      summary: Show users address
+      description: Show user's address
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID required
+          schema:
+            type: string
+      responses:
+        201:
+          description: address available
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/User"
+        500:
+          description: Bad request
+        404:
+          description: user not found
+    post:
+      summary: adding user address
+      description: adding user address
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/User"
+
+      responses:
+        201:
+          description: done
+
+        500:
+          description: Bad request
+
+    put:
+      summary: update user address
+      description: update user address
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Numeric ID required
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/User"
+      responses:
+        200:
+          description: updated succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/User"
+        400:
+          description: Bad request
+    delete:
+      summary: To get delete address
+      description: To get delete address
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Numeric ID required
+          schema:
+            type: string
+      responses:
+        200:
+          description: address is deleted
+
+        400:
+          description: failed to delete
+        404:
+          description: address not found
+
+  /api/cart/:
+    get:
+      summary: show cart items
+      description:  show cart items 
+      responses:
+        200:
+          description: items found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Cart"
+        404:
+          description: items not found
+        500: 
+          description: error
+    post:
+      summary: add to cart
+      description: To add a product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/Cart"
+
+      responses:
+        201:
+          description: Succesfully added
+        500:
+          description: Bad request
+    delete:
+        summary: To get delete cart
+        description: To get delete cart
+        responses:
+          200:
+            description: deleted succesfully
+
+          400:
+            description: failed to delete
+          404:
+            description: cart not found
+
+  /api/cart/{id}:
+    get:
+      summary: Show a particular item in cart
+      description: Show a particular item in cart
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID required
+          schema:
+            type: string
+      responses:
+        201:
+          description: item available
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Cart"
+        500:
+          description: Bad request
+        404:
+          description: user not found
+    put:
+      summary: update user item
+      description: update user item
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Numeric ID required
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/Cart"
+      responses:
+        200:
+          description: updated succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Cart"
+        400:
+          description: Bad request
+    delete:
+      summary: To get delete item
+      description: To get delete item
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Numeric ID required
+          schema:
+            type: string
+      responses:
+        200:
+          description: item is deleted
+
+        400:
+          description: failed to delete
+        404:
+          description: address not found
+  /api/orders/:
+    get:
+      summary: show cart orders
+      description:  show cart orders
+      responses:
+        200:
+          description: orders found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Order"
+        404:
+          description: orders not found
+        500: 
+          description: error
+    post:
+      summary: add to order
+      description: To add a order
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/Order"
+
+      responses:
+        201:
+          description: Succesfully added
+        500:
+          description: Bad request
+  /api/order/{id}:
+    get:
+      summary: Show a particular Order
+      description: Show a particular Order
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID required
+          schema:
+            type: string
+      responses:
+        201:
+          description: Order available
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Order"
+        500:
+          description: Bad request
+        404:
+          description: Order not found
+    put:
+      summary: update order
+      description: update order
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Numeric ID required
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/Order"
+      responses:
+        200:
+          description: updated succesfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Order"
+        400:
+          description: Bad request
+  /api/order/{id}/tracking:
+    get:
+      summary: Show a particular Order tracking
+      description: Show a particular Order tracking
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID required
+          schema:
+            type: string
+      responses:
+        201:
+          description: Order tracking available
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#components/schemas/Order"
+        500:
+          description: Bad request
+        404:
+          description: Order not found
