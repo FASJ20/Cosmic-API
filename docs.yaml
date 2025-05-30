@@ -733,21 +733,7 @@ paths:
           description: orders not found
         500: 
           description: error
-    post:
-      summary: add to order
-      description: To add a order
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#components/schemas/Order"
-
-      responses:
-        201:
-          description: Succesfully added
-        500:
-          description: Bad request
+   
   /api/order/{id}:
     get:
       summary: Show a particular Order
@@ -772,6 +758,28 @@ paths:
           description: Bad request
         404:
           description: Order not found
+    post:
+      summary: add to order
+      description: To add a order
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID required
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/Order"
+
+      responses:
+        201:
+          description: Succesfully added
+        500:
+          description: Bad request
     put:
       summary: update order
       description: update order
