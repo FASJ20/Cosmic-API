@@ -1,5 +1,6 @@
 import { Order } from "../models/Order.model.js";
 import { Cart } from "../models/cart.model.js";
+import { validationResult } from "express-validator";
 import { calculateTotal } from "./cart.controllers.js";
 
 export const getOrders = async (req, res) => {
@@ -15,6 +16,8 @@ export const getOrders = async (req, res) => {
 }
 
 export const AddOrders = async (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.send(result.array());
     const {body, params:id} = req;
     try{
         const findCart = await Cart.findOne({userid: id.id})
@@ -42,6 +45,8 @@ export const ShowOneOrder = async (req, res) => {
 }
 
 export const updateOrderStatus = async (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.send(result.array());
     const {body, params: id} = req
     try{
         const findOrders = await Order.findOne({ _id: id.id });

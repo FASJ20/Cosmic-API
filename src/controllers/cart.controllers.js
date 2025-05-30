@@ -1,8 +1,12 @@
 import { Cart } from "../models/cart.model.js";
+import { validationResult } from "express-validator";
+
+
 export let calculateTotal = (items) => {
     return items.reduce((sum, i) => sum + (i.price * i.quantity), 0)
 }
 export const ShowCartItems = async (req, res) => {
+    
     const {params: id} = req
     try{
         const ShowItems = await Cart.findOne({_id:id.id});
@@ -21,6 +25,8 @@ export const ShowCartItems = async (req, res) => {
 }
 
 export const createCart = async (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.send(result.array());
     const {body} = req;
     try{
         const AddCart = new Cart ({...body, totalamount: calculateTotal(body.item)})
@@ -34,6 +40,8 @@ export const createCart = async (req, res) => {
     }
 }
 export const AddItem = async (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.send(result.array());
     const {body, params: id} = req;
     try{
         const findCart = await Cart.findOne({_id: id.id});
@@ -54,6 +62,8 @@ export const AddItem = async (req, res) => {
 
 
 export const updateCartItems = async (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.send(result.array());
     const {body, params:id} = req;
     try{
         const findCart = await Cart.findOne({_id:id.id})

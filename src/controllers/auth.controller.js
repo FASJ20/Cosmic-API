@@ -1,9 +1,12 @@
 import { hashPassword, comparePassword } from "../utils/hashpassword.js";
 import { User } from "../models/User.model.js";
+import { validationResult } from "express-validator";
 import { createToken, refreshToken} from "../config/jwt.js";
 import { RefreshToken } from "../models/RefreshToken.model.js";
 
 export const registerUser = async (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.send(result.array());
     const { body } = req;
     let hashedPassword = await hashPassword(body.password);
     console.log(body.password);

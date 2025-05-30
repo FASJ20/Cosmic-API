@@ -1,5 +1,5 @@
 import { Product } from "../models/Product.model.js";
-import { authenticateToken, authenticateRefreshToken } from "../middleware/auth.middleware.js";
+import { validationResult } from "express-validator";
 
 // To Show all the products available
 export const ShowAllProducts = async (req, res) => {
@@ -28,6 +28,8 @@ export const GetOneProduct = async (req, res) => {
 }
 // Add product
 export const addProduct = async (req, res) =>{
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.send(result.array());
     const {body} = req;
     try{
         const AddProd = new Product ({...body})
@@ -45,6 +47,8 @@ export const addProduct = async (req, res) =>{
 }
 // To update product
 export const updateProduct = async (req, res) => {
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.send(result.array());
     const {body, params:id} = req;
     try {
         const UpdateProd = await Product.updateOne({ _id: id.id }, {$set: body}, {updatedat: new Date()});

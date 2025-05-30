@@ -1,22 +1,31 @@
 import express from "express";
+import mongoose from "mongoose";
 import authRouter from "./routes/auth.route.js";
 import productsRouter from "./routes/products.route.js";
 import cartRouter from "./routes/cart.route.js";
 import orderRouter from "./routes/order.route.js";
 import userRouter from "./routes/user.route.js";
+import rateLimit from "express-rate-limit";
 import fs from "fs";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yaml";
 import { dbconnect } from "./config/db.js";
 
-
-
-dbconnect();
-
+dbconnect()
 
 const app = express();
+const limiter = rateLimit({
+    windowMs: 1 * 60 * 1000, // 1 minute
+    max: 10,
+    message: "To many request, please try again after a minute"
+})
 
-app.use(express.json())
+
+
+
+
+app.use(limiter);
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 
