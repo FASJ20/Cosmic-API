@@ -20,8 +20,10 @@ export const AddOrders = async (req, res) => {
     if (!result.isEmpty()) return res.send(result.array());
     const {body, params:id} = req;
     try{
-        const findCart = await Cart.findOne({userid: id.id})
-        const AddOrder = new Order({...body, items: findCart.item, totalamount: calculateTotal(items)})
+        const findCart = await Cart.findOne({userid: id.id});
+        if (!findCart || findCart.item.length === 0) return res.status(400).json({ message: "Cart is empty or not found" });
+        
+        const AddOrder = new Order({...body, userid: id.id, items: findCart.item, totalamount: calculateTotal(findCart.item)})
         await AddOrder.save().then((Order) => {
             console.log(Order);
             res.status(201).json(Order)

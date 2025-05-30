@@ -10,6 +10,8 @@ import fs from "fs";
 import swaggerUi from "swagger-ui-express";
 import YAML from "yaml";
 import { dbconnect } from "./config/db.js";
+import helmet from "helmet";
+import cors from "cors"
 
 dbconnect()
 
@@ -25,6 +27,12 @@ const limiter = rateLimit({
 
 
 app.use(limiter);
+app.use(helmet());
+app.use(cors({
+    origin: "*",
+    credentials: true,
+    methods: ["GET", "POST"]
+}))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 

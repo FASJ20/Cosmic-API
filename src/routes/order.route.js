@@ -8,7 +8,7 @@ const router = Router();
 
 router.get("/", getOrders);
 router.get("/:id", ShowOneOrder);
-router.post("/", checkSchema(orderValSchema),AddOrders);
+router.post("/:id", checkSchema(orderValSchema), AddOrders);
 router.put("/:id", authorizeRoles("admin"), updateOrderStatus);
 router.get("/:id/tracking", getOrderTracking);
 
