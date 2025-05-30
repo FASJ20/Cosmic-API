@@ -411,7 +411,7 @@ paths:
 
         400:
           description: Bad request
-  
+  #Users API
   /api/users/me/{id}:
     get:
       summary: One product
@@ -551,6 +551,32 @@ paths:
           description: failed to delete
         404:
           description: address not found
+  /api/users/me/password/{id}:
+    post:
+      summary: change password
+      description: changepassword
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Numeric ID required
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/User"
+
+      responses:
+        201:
+          description: done
+
+        500:
+          description: Bad request
+
+
 
   /api/cart/:
     get:
@@ -620,6 +646,31 @@ paths:
           description: Bad request
         404:
           description: user not found
+    post:
+      summary: Add items to cart
+      description: Add Items to cart
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Numeric ID required
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#components/schemas/Cart"
+
+      responses:
+        201:
+          description: Items successfully added to Cart
+
+        500:
+          description: Bad request
+
+
     put:
       summary: update user item
       description: update user item

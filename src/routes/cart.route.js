@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { ShowCartItems, ShowOneItem, AddCartItems, updateCartItems, deleteCartItems, deleteCart } from "../controllers/cart.controllers.js";
+import { ShowCartItems, AddItem, updateCartItems, deleteCartItems, deleteCart, createCart } from "../controllers/cart.controllers.js";
 
 const router = Router()
 
-router.get("/", ShowCartItems);
-router.get("/:id", ShowOneItem);
-router.post("/", AddCartItems);
+router.get("/:id", ShowCartItems);
+router.post("/", createCart);
+router.post("/:id", AddItem);
 router.put("/:id", updateCartItems);
 router.delete("/:id", deleteCartItems);
 router.delete("/", deleteCart);

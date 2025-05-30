@@ -1,9 +1,12 @@
 import { Order } from "../models/Order.model.js";
+import { Cart } from "../models/cart.model.js";
+import { calculateTotal } from "./cart.controllers.js";
 
 export const getOrders = async (req, res) => {
+    const {params:id} = req;
     try{
-        const ShowOrders = await Order.find();
-        if (!ShowOrders) return res.status(401).json({message: "No Orders found"});
+        const ShowOrders = await Order.findone({_id: id.id});
+        if (!ShowOrders) return res.status(401).json({message: "No Order found"});
         res.status(200).json(ShowOrders);
     } catch (err) {
         console.error(err);
@@ -12,9 +15,10 @@ export const getOrders = async (req, res) => {
 }
 
 export const AddOrders = async (req, res) => {
-    const {body} = req;
+    const {body, params:id} = req;
     try{
-        const AddOrder = new Order({...body})
+        const findCart = await Cart.findOne({userid: id.id})
+        const AddOrder = new Order({...body, items: findCart.item, totalamount: calculateTotal(items)})
         await AddOrder.save().then((Order) => {
             console.log(Order);
             res.status(201).json(Order)
@@ -30,7 +34,7 @@ export const ShowOneOrder = async (req, res) => {
     try{
         const OneOrder = await Order.findOne({_id: id.id});
         if (!OneOrder ) return res.status(401).json({message: "Order not found"});
-        res.status(200).json(OneOrder );
+        res.status(200).json(OneOrder);
     } catch (err) {
         console.error(err);
         res.status(500).json({message: err});

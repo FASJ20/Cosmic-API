@@ -72,7 +72,6 @@ export const GetReviews = async (req, res) => {
     const {body, params: id} = req
     try{
         const product = await Product.findOne({ _id: id.id });
-        console.log(product.ratings._id)
         product.ratings = {
             rating: body.rating ? body.rating : product.ratings.rating,
             review: body.review ? body.review : product.ratings.review

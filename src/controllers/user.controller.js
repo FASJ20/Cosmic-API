@@ -1,4 +1,5 @@
 import { User } from "../models/User.model.js";
+import { hashPassword, comparePassword } from "../utils/hashpassword.js";
 
 export const GetUserprofile = async (req, res) => {
     const {params: id} = req;
@@ -80,6 +81,20 @@ export const DeleteAddress = async (req, res) => {
         if (!findUser) return res.status(404).json({message: "User not found"});
         const deleteUser = findUser.deleteOne(addresses)
 
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({message: err || "error"});
+    }
+}
+export const changePassword = async (req, res) => {
+    const {body, params:id} = req;
+    try{
+        const findUser = await User.findOne({_id: id.id});
+        if (!comparePassword(body.password, findUser.password)) return res.status(401).json({message: "wrong password"});
+        let changepass = hashPassword(body.newpassword);
+        findUser.password = changepass;
+        await findUser.save();
+        return res.json(findUser);
     } catch (err) {
         console.error(err);
         res.status(500).json({message: err || "error"});
