@@ -73,9 +73,12 @@ export const loginUser = async (req, res) => {
 
 export const token = async (req, res) => {
     const findUser= req.user.sub
-    const token = createToken(findUser._id);
-    const token2 = refreshToken(findUser._id);
-    let StoredRefreshtoken = await RefreshToken.findOne({userId: findUser._id});
+    const token = createToken(findUser._id, findUser.role);
+    const token2 = refreshToken(findUser._id, findUser.role);
+    let StoredRefreshtoken = await RefreshToken.findOne({
+      userId: findUser._id,
+      role: findUser.role
+    });
     if(!StoredRefreshtoken){
       const NewRefreshToken = new RefreshToken ({
         userId: findUser._id,
