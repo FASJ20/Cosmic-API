@@ -1,6 +1,6 @@
 FROM node:24.1.0-slim
 
-
+WORKDIR /app
 
 COPY . .
 
