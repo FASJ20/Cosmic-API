@@ -1,5 +1,4 @@
 import express from "express";
-import mongoose from "mongoose";
 import authRouter from "./routes/auth.route.js";
 import productsRouter from "./routes/products.route.js";
 import cartRouter from "./routes/cart.route.js";

@@ -251,7 +251,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/product"
+                  $ref: "#/components/schemas/Product"
         404:
           description: Products not found
         500: 
@@ -264,7 +264,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/product"
+              $ref: "#/components/schemas/Product"
 
       responses:
         201:
@@ -290,7 +290,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/products"
+                  $ref: "#/components/schemas/Product"
         500:
           description: Bad request
         404:
@@ -314,7 +314,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/product"
+              $ref: "#/components/schemas/Product"
       responses:
         200:
           description: updated succesfully
@@ -323,7 +323,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/product"
+                  $ref: "#/components/schemas/Product"
         400:
           description: Bad request
       
@@ -362,7 +362,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/product"
+              $ref: "#/components/schemas/Product"
       responses:
         200:
           description: updated succesfully
@@ -371,7 +371,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/product"
+                  $ref: "#/components/schemas/Product"
         400:
           description: Bad request
 
@@ -385,7 +385,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/User"
+              $ref: "#/components/schemas/User"
 
       responses:
         200:
@@ -403,7 +403,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/User"
+              $ref: "#/components/schemas/User"
 
       responses:
         200:
@@ -431,7 +431,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/User"
+                  $ref: "#/components/schemas/User"
         500:
           description: Bad request
         404:
@@ -452,7 +452,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/User"
+              $ref: "#/components/schemas/User"
       responses:
         200:
           description: updated succesfully
@@ -461,7 +461,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/User"
+                  $ref: "#/components/schemas/User"
         400:
           description: Bad request
 
@@ -484,7 +484,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/User"
+                  $ref: "#/components/schemas/User"
         500:
           description: Bad request
         404:
@@ -497,7 +497,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/User"
+              $ref: "#/components/schemas/User"
 
       responses:
         201:
@@ -521,7 +521,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/User"
+              $ref: "#/components/schemas/User"
       responses:
         200:
           description: updated succesfully
@@ -530,7 +530,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/User"
+                  $ref: "#/components/schemas/User"
         400:
           description: Bad request
     delete:
@@ -567,7 +567,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/User"
+              $ref: "#/components/schemas/User"
 
       responses:
         201:
@@ -590,7 +590,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/Cart"
+                  $ref: "#/components/schemas/Cart"
         404:
           description: items not found
         500: 
@@ -603,7 +603,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/Cart"
+              $ref: "#/components/schemas/Cart"
 
       responses:
         201:
@@ -641,7 +641,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/Cart"
+                  $ref: "#/components/schemas/Cart"
         500:
           description: Bad request
         404:
@@ -661,7 +661,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/Cart"
+              $ref: "#/components/schemas/Cart"
 
       responses:
         201:
@@ -686,7 +686,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/Cart"
+              $ref: "#/components/schemas/Cart"
       responses:
         200:
           description: updated succesfully
@@ -695,7 +695,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/Cart"
+                  $ref: "#/components/schemas/Cart"
         400:
           description: Bad request
     delete:
@@ -728,7 +728,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/Order"
+                  $ref: "#/components/schemas/Order"
         404:
           description: orders not found
         500: 
@@ -753,7 +753,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/Order"
+                  $ref: "#/components/schemas/Order"
         500:
           description: Bad request
         404:
@@ -773,7 +773,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/Order"
+              $ref: "#/components/schemas/Order"
 
       responses:
         201:
@@ -795,7 +795,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#components/schemas/Order"
+              $ref: "#/components/schemas/Order"
       responses:
         200:
           description: updated succesfully
@@ -804,7 +804,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/Order"
+                  $ref: "#/components/schemas/Order"
         400:
           description: Bad request
   /api/order/{id}/tracking:
@@ -826,7 +826,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#components/schemas/Order"
+                  $ref: "#/components/schemas/Order"
         500:
           description: Bad request
         404:
