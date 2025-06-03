@@ -1,5 +1,5 @@
 import { Order } from "../models/Order.model.js";
-import { Cart } from "../models/cart.model.js";
+import { Cart } from "../models/Cart.model.js";
 import { validationResult } from "express-validator";
 import { calculateTotal } from "./cart.controllers.js";
 
