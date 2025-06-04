@@ -14,7 +14,7 @@ export const getOrders = async (req, res) => {
         res.status(500).json({message: err});
     }
 }
-
+// Add orders using the user's Id
 export const AddOrders = async (req, res) => {
     const result = validationResult(req);
     if (!result.isEmpty()) return res.send(result.array());

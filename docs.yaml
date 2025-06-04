@@ -734,7 +734,7 @@ paths:
         500: 
           description: error
    
-  /api/order/{id}:
+  /api/orders/{id}:
     get:
       summary: Show a particular Order
       description: Show a particular Order
@@ -807,7 +807,7 @@ paths:
                   $ref: "#/components/schemas/Order"
         400:
           description: Bad request
-  /api/order/{id}/tracking:
+  /api/orders/{id}/tracking:
     get:
       summary: Show a particular Order tracking
       description: Show a particular Order tracking
