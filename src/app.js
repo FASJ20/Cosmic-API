@@ -11,6 +11,11 @@ import YAML from "yaml";
 import { dbconnect } from "./config/db.js";
 import helmet from "helmet";
 import cors from "cors"
+import Stripe from 'stripe';
+import { stripe_secrete_key } from "./config/env.config.js";
+
+const stripe = new Stripe(stripe_secrete_key);
+
 
 dbconnect()
 
@@ -28,9 +33,10 @@ const limiter = rateLimit({
 app.use(limiter);
 app.use(helmet());
 app.use(cors({
-    origin: "*",
+    origin: "http://localhost:5173",
     credentials: true,
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST"],
+    allowedHeaders: ['Content-Type', 'Authorization']
 }))
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

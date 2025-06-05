@@ -2,6 +2,13 @@ import { Order } from "../models/Order.model.js";
 import { Cart } from "../models/Cart.model.js";
 import { validationResult } from "express-validator";
 import { calculateTotal } from "./cart.controllers.js";
+import Stripe from 'stripe';
+import { stripe_secrete_key } from "../config/env.config.js"
+import { success_url } from "../config/env.config.js";
+import { cancel_url } from "../config/env.config.js";
+
+
+const stripe = new Stripe(stripe_secrete_key);
 
 export const getOrders = async (req, res) => {
     const {params:id} = req;
@@ -80,5 +87,41 @@ export const getOrderTracking = async (req, res) => {
     } catch (err) {
         res.status(500).json({message: err}) 
         console.error(err)
+    }
+}
+export const payment = async (req, res) => {
+    const {params: id} = req
+    try{
+        const findOrder = await Order.findOne({_id: id.id});
+        if (!findOrder) return res.status(404).json({message: "Order not found"})
+        const session = await stripe.checkout.sessions.create({
+            line_items: [
+                {
+                    price_data: {
+                        currency: 'usd',
+                        product_data: {
+                            name: findOrder.items.name,
+                        },
+                        unit_amount: findOrder.items.price * 100
+                    },
+                    quantity: findOrder.items.quantity
+                }
+            ],
+            mode: 'payment',
+            shipping_address_collection: {
+                allowed_countries: ['CM', 'US', 'BR']
+            },
+            success_url: `${success_url}`,
+            cancel_url: `${cancel_url}`
+        })
+        if (!session) {
+            findOrder.paymentstatus = 'failed'
+            return
+        }
+        findOrder.paymentstatus = 'paid'
+        res.redirect(session.url)
+    } catch (err) {
+        res.status(500).json({message: err}) 
+        console.error(err) 
     }
 }
