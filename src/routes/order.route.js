@@ -12,7 +12,7 @@ router.get("/:id", ShowOneOrder);
 router.post("/:id", checkSchema(orderValSchema), AddOrders);
 router.put("/:id", authorizeRoles("admin"), updateOrderStatus);
 router.get("/:id/tracking", getOrderTracking);
-router.get("/payment/:id", authenticateToken, payment)
+router.post("/payment/:id", authenticateToken, payment)
 
 
 export default router;

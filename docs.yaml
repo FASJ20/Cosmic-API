@@ -831,3 +831,28 @@ paths:
           description: Bad request
         404:
           description: Order not found
+  /api/orders/payment/{id}:
+     post:
+      summary: payment
+      description: For payment
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID required
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Order"
+
+      responses:
+        201:
+          description: Succesfully paid
+        401:
+          description: payment unsuccessful
+        500:
+          description: error

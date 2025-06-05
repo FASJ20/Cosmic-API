@@ -114,10 +114,7 @@ export const payment = async (req, res) => {
             success_url: `${success_url}`,
             cancel_url: `${cancel_url}`
         })
-        if (!session) {
-            findOrder.paymentstatus = 'failed'
-            return
-        }
+        if (!session) return res.status(401).json({message: "Payment Unsuccessful"})
         findOrder.paymentstatus = 'paid'
         res.redirect(session.url)
     } catch (err) {
