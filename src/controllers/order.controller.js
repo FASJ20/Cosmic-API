@@ -6,7 +6,7 @@ import { calculateTotal } from "./cart.controllers.js";
 export const getOrders = async (req, res) => {
     const {params:id} = req;
     try{
-        const ShowOrders = await Order.findone({_id: id.id});
+        const ShowOrders = await Order.findOne({_id: id.id});
         if (!ShowOrders) return res.status(401).json({message: "No Order found"});
         res.status(200).json(ShowOrders);
     } catch (err) {
