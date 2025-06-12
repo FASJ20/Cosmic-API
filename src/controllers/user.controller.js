@@ -28,10 +28,20 @@ export const updateUserProfile = async (req, res) => {
 
 export const AddNewAddress = async (req, res) => {
     const { body, params:id } = req;
-    let addresses = req.body
+   
     try{
-        const findUser = await User.updateOne({_id: id.id}, {$set: addresses});
+        const findUser = await User.findOne({_id: id.id});
         if (!findUser) return res.status(404).json({message: "User not found"});
+         findUser.addresses = {
+            street:  body.street,
+            city: body.city,
+            state: body.state,
+            zipcode: body.zipcode,
+            country: body.country,
+            isdefault: body.isdefault
+        }
+        await findUser.save()
+        console.log(findUser)
        
         res.status(201).json(findUser.addresses)
 
@@ -79,7 +89,8 @@ export const DeleteAddress = async (req, res) => {
     try{
         const findUser = await User.findOne({_id: id.id});
         if (!findUser) return res.status(404).json({message: "User not found"});
-        const deleteUser = findUser.deleteOne(addresses)
+        const DeleteAddress = findUser.addresses.slice()
+        res.json({message: "Address succesfully deleted"})
 
     } catch (err) {
         console.error(err);
@@ -87,11 +98,11 @@ export const DeleteAddress = async (req, res) => {
     }
 }
 export const changePassword = async (req, res) => {
-    const {body, params:id} = req;
+    const {body: {password, newpassword}, params:id} = req;
     try{
         const findUser = await User.findOne({_id: id.id});
-        if (!comparePassword(body.password, findUser.password)) return res.status(401).json({message: "wrong password"});
-        let changepass = hashPassword(body.newpassword);
+        if (!comparePassword(password, findUser.password)) return res.status(401).json({message: "wrong password"});
+        let changepass = hashPassword(newpassword);
         findUser.password = changepass;
         await findUser.save();
         return res.json(findUser);
