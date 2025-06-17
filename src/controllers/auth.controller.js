@@ -72,21 +72,56 @@ export const loginUser = async (req, res) => {
 };
 
 export const token = async (req, res) => {
-    const findUser= req.user.sub
-    const token = createToken(findUser._id, findUser.role);
-    const token2 = refreshToken(findUser._id, findUser.role);
-    let StoredRefreshtoken = await RefreshToken.findOne({
-      userId: findUser._id,
-      role: findUser.role
-    });
-    if(!StoredRefreshtoken){
-      const NewRefreshToken = new RefreshToken ({
-        userId: findUser._id,
-        token: token2
+  try {
+    const user = req.user.sub;
+
+    const accessToken = createToken(user._id, user.role);
+    const refreshTokenValue = refreshToken(user._id, user.role);
+
+    const existing = await RefreshToken.findOne({ userId: user._id });
+
+    if (!existing) {
+      const newToken = new RefreshToken({
+        userId: user._id,
+        role: user.role,
+        token: refreshTokenValue,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       });
-      await NewRefreshToken.save()
+      await newToken.save();
     } else {
-      let new_token = await RefreshToken.findOneAndUpdate({userId: findUser._id},{token: token2},{new: true})
+      await RefreshToken.findOneAndUpdate(
+        { userId: user._id },
+        { token: refreshTokenValue, role: user.role, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
+        { new: true }
+      );
     }
-    return res.json({status: true, message: "success", data: {token, token2}})
-}
+    return res.json({
+      status: true,
+      message: "success",
+      data: {
+        accessToken,
+        refreshToken: refreshTokenValue,
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ status: false, message: "Token generation failed" });
+  }
+};
+export const logout = async (req, res) => {
+  try {
+    const userId = req.user.sub?._id || req.user.sub;
+    const role = req.user.role;
+
+    const deleted = await RefreshToken.findOneAndDelete({ userId, role, token });
+
+    if (!deleted) {
+      return res.status(400).json({ message: "No active session found or already logged out" });
+    }
+
+    return res.status(200).json({ message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
+    return res.status(500).json({ message: "Failed to logout. Internal server error" });
+  }
+};

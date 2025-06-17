@@ -13,6 +13,7 @@ import helmet from "helmet";
 import cors from "cors"
 import Stripe from 'stripe';
 import { stripe_secrete_key } from "./config/env.config.js";
+import apiKeyAuth from "./middleware/apiKeyAuth";
 
 const stripe = new Stripe(stripe_secrete_key);
 
@@ -39,7 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const file = fs.readFileSync("./docs.yaml", "utf8");
 const swaggerDocument = YAML.parse(file);
-
+app.use(apiKeyAuth);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use("/api/auth", authRouter);
 app.use("/api/products", productsRouter);

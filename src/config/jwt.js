@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import "dotenv/config"
 import { jwtsecret } from "./env.config.js";
 import { refreshsecrete } from "./env.config.js";
-import { RefreshToken } from "../models/RefreshToken.model.js";
+
 
 export const MaxAge= '40m'
 export const createToken = (id, role) => {
@@ -14,7 +14,7 @@ export const createToken = (id, role) => {
 };
 export const refreshToken = (id, role) => {
     return jwt.sign({ id, role }, `${refreshsecrete}`, {
-    expiresIn: "3d",
+    expiresIn: "7d",
   });
 };
 

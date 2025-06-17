@@ -7,6 +7,11 @@ const refreshTokenSchema = new mongoose.Schema({
     ref: 'User', 
     required: true 
     },
+    role: {
+      type: mongoose.Schema.Types.String,
+      enum: ['user', 'admin'],
+      default: 'user'
+    },
   token: { 
     type: String, 
     required: true 

@@ -6,7 +6,7 @@ import { authorizeRoles } from "../middleware/role.middleware.js";
 import { authenticateToken } from "../middleware/auth.middleware.js";
 
 const router = Router();
-
+router.use(authenticateToken);
 router.get("/", getOrders);
 router.get("/:id", ShowOneOrder);
 router.post("/:id", checkSchema(orderValSchema), AddOrders);
