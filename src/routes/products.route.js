@@ -7,8 +7,6 @@ import { authorizeRoles } from "../middleware/role.middleware.js";
 
 const router = Router();
 
-router.use(authenticateToken)
-
 router.get("/", ShowAllProducts);
 router.get("/:id",authenticateToken, GetOneProduct);
 router.post("/", authenticateToken, authorizeRoles("admin"), checkSchema(createProductValidationScheme), addProduct);
