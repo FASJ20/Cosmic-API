@@ -117,6 +117,8 @@ export const payment = async (req, res) => {
         if (!session) return res.status(401).json({message: "Payment Unsuccessful"})
         findOrder.paymentstatus = 'paid'
         findOrder.items.slice()
+        await findOrder.save()
+        console.log("Payment successful:", session);
         res.redirect(session.url)
     } catch (err) {
         res.status(500).json({message: err}) 
