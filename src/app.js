@@ -13,7 +13,7 @@ import helmet from "helmet";
 import cors from "cors"
 import Stripe from 'stripe';
 import { stripe_secrete_key } from "./config/env.config.js";
-import apiKeyAuth from "./middleware/apiKeyAuth";
+// import apiKeyAuth from "./middleware/apiKeyAuth";
 
 const stripe = new Stripe(stripe_secrete_key);
 
