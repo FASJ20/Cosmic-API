@@ -88,3 +88,20 @@ export const GetReviews = async (req, res) => {
        res.status(500).json({message: err}) 
     }
 }
+
+export const GetbyCategory = async (req, res) => {
+    const {query: {category}} = req;
+    try {
+       
+        const filter = {};
+        if (category) {
+        filter.category = category; 
+        }
+        const products = await Product.find({filter});
+        if (!products) return res.status(404).json({message: "No Products found"})
+        res.status(200).json(products)
+    } catch (err) {
+        console.error(err)
+        res.status(500).json({message: err})
+    }
+}
