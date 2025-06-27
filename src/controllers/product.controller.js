@@ -2,10 +2,16 @@ import { Product } from "../models/Product.model.js";
 import { validationResult } from "express-validator";
 
 // To Show all the products available
-export const ShowAllProducts = async (req, res) => {
-    
+export const ShowProducts = async (req, res) => {
+    const {query: {category}} = req;
+    console.log(category)
     try {
-        let products = await Product.find()
+        const filter = {};
+        if (category) {
+        filter.category = category; 
+        }
+
+        let products = await Product.find(filter)
         if (!products) return res.status(404).json({message: "No Products found"})
         res.status(200).json(products)
     } catch (err){
@@ -89,19 +95,3 @@ export const GetReviews = async (req, res) => {
     }
 }
 
-export const GetbyCategory = async (req, res) => {
-    const {query: {category}} = req;
-    try {
-       
-        const filter = {};
-        if (category) {
-        filter.category = category; 
-        }
-        const products = await Product.find({filter});
-        if (!products) return res.status(404).json({message: "No Products found"})
-        res.status(200).json(products)
-    } catch (err) {
-        console.error(err)
-        res.status(500).json({message: err})
-    }
-}

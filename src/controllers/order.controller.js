@@ -1,7 +1,7 @@
 import { Order } from "../models/Order.model.js";
 import { Cart } from "../models/Cart.model.js";
 import { validationResult } from "express-validator";
-import { calculateTotal } from "./cart.controllers.js";
+import { calculateTotal } from "./cart.controller.js";
 import Stripe from 'stripe';
 import { stripe_secrete_key } from "../config/env.config.js"
 import { success_url } from "../config/env.config.js";
@@ -25,12 +25,13 @@ export const getOrders = async (req, res) => {
 export const AddOrders = async (req, res) => {
     const result = validationResult(req);
     if (!result.isEmpty()) return res.send(result.array());
-    const {body, params:id} = req;
+    const {body} = req;
     try{
-        const findCart = await Cart.findOne({userid: id.id});
+        const userid = req.user.id;
+        const findCart = await Cart.findOne({userid: userid});
         if (!findCart || findCart.item.length === 0) return res.status(400).json({ message: "Cart is empty or not found" });
-        
-        const AddOrder = new Order({...body, userid: id.id, items: findCart.item, totalamount: calculateTotal(findCart.item)})
+
+        const AddOrder = new Order({...body, userid: userid, items: findCart.item, totalamount: calculateTotal(findCart.item)})
         await AddOrder.save().then((Order) => {
             console.log(Order);
             res.status(201).json(Order)
@@ -47,6 +48,20 @@ export const ShowOneOrder = async (req, res) => {
         const OneOrder = await Order.findOne({_id: id.id});
         if (!OneOrder ) return res.status(401).json({message: "Order not found"});
         res.status(200).json(OneOrder);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({message: err});
+    }
+}
+
+export const deleteOrder = async (req, res) => {
+    const {params: id} = req;
+    try{
+        const findOrder = await Order.findOne({_id: id.id});
+        if (!findOrder) return res.status(404).json({message: "Order not found"});
+        findOrder.items.slice();
+        await findOrder.save();
+        res.status(200).json({message: "Order deleted successfully"});
     } catch (err) {
         console.error(err);
         res.status(500).json({message: err});

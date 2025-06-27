@@ -4,6 +4,7 @@ import productsRouter from "./routes/products.route.js";
 import cartRouter from "./routes/cart.route.js";
 import orderRouter from "./routes/order.route.js";
 import userRouter from "./routes/user.route.js";
+import wishlistRouter from "./routes/wishlist.route.js";
 import rateLimit from "express-rate-limit";
 import fs from "fs";
 import swaggerUi from "swagger-ui-express";
@@ -45,6 +46,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/products", productsRouter);
 app.use("/api/cart", cartRouter);
 app.use("/api/orders", orderRouter);
-app.use("/api/users/me", userRouter)
+app.use("/api/users/me", userRouter);
+app.use("/api/wishlist", wishlistRouter);
 
 export default app;
