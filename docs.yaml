@@ -981,3 +981,61 @@ paths:
           description: Wishlist created successfully
         400:
           description: Bad request
+  /api/categories/:
+    get:
+      summary: Get all categories
+      description: Retrieve a list of all product categories
+      responses:
+        200:
+          description: Categories found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        404:
+          description: Categories not found
+        500:
+          description: Error retrieving categories
+  /api/categories/{category}:
+    get:
+      summary: Get products by category
+      description: Retrieve products belonging to a specific category
+      parameters:
+        - in: path
+          name: category
+          required: true
+          description: Category name
+          schema:
+            type: string
+      responses:
+        200:
+          description: Products found in the category
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+        404:
+          description: Category not found or no products in this category
+        500:
+          description: Error retrieving products by category
+    delete:
+      summary: Delete products by category
+      description: Remove all products belonging to a specific category
+      parameters:
+        - in: path
+          name: category
+          required: true
+          description: Category name
+          schema:
+            type: string
+      responses:
+        200:
+          description: Products deleted successfully
+        404:
+          description: Category not found
+        500:
+          description: Error deleting products by category
