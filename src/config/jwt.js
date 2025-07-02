@@ -12,7 +12,7 @@ export const createToken = (id, role) => {
     expiresIn: MaxAge,
   });
 };
-export const refreshToken = (id, role) => {
+export const createrefreshToken = (id, role) => {
     return jwt.sign({ id, role }, `${refreshsecrete}`, {
     expiresIn: "7d",
   });

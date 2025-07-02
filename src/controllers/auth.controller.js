@@ -1,8 +1,10 @@
 import { hashPassword, comparePassword } from "../utils/hashpassword.js";
 import { User } from "../models/User.model.js";
 import { validationResult } from "express-validator";
-import { createToken, refreshToken} from "../config/jwt.js";
+import { createToken, createrefreshToken} from "../config/jwt.js";
 import { RefreshToken } from "../models/RefreshToken.model.js";
+import jwt from "jsonwebtoken";
+import { refreshsecrete } from "../config/env.config.js";
 
 export const registerUser = async (req, res) => {
     const result = validationResult(req);
@@ -28,100 +30,65 @@ export const registerUser = async (req, res) => {
     }
 };
 export const loginUser = async (req, res) => {
-    const {
-    body: { email, password },
-  } = req;
-  // const user = new User();
-  try {
-    // To find user from the user database
-    const findUser = await User.findOne({ email });
+    const { body: {email, password} } = req;
+    const result = validationResult(req);
+    if (!result.isEmpty()) return res.send(result.array());
     
-    
-    if (!findUser) throw new Error("User not found");
-
-    // Importing the compare password variable to see if the user password matches with the hashed password in the database
-    if (!comparePassword(password, findUser.password)) {
-      return res.status(404).send("Bad Credentials");
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const isMatch = comparePassword(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid credentials" });
+        }
+        const token = createToken(user._id, user.role);
+        const refreshToken = createrefreshToken(user._id, user.role);
+        // Save the refresh token in the database
+        const newRefreshToken = new RefreshToken({ 
+            userId: user._id,
+            token: refreshToken,
+            role: user.role });
+        await newRefreshToken.save();
+        res.json({ user: {  email: user.email }, token, refreshToken });
+    } catch (err) {
+        res.status(500).json({ message: "Server Error", error: err.message });
     }
-    //creat both access and refresh tokens
-    const token = createToken(findUser._id, findUser.role);
-    const token2 = refreshToken(findUser._id, findUser.role);
-    let StoredRefreshtoken = await RefreshToken.findOne({userId: findUser._id});
-    if(!StoredRefreshtoken){
-      const NewRefreshToken = new RefreshToken ({
-        userId: findUser._id,
-        token: token2
-      });
-      await NewRefreshToken.save()
-    } else {
-      let new_token = await RefreshToken.findOneAndUpdate({userId: findUser._id},{token: token2},{new: true})
-    }
-    console.log(token2)
-    res.set('Authorization', `Bearer ${token}`);
-    res.set('X-Custom-Header', 'CustomHeaderValue');
-    return res.status(200).json({
-      message: 'Login successful',
-      token,
-      refreshToken: token2,
-      user: findUser,
-    });
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ error: err.message || "Login failed" });
-  }
 };
 
 export const token = async (req, res) => {
-  try {
-    const user = req.user.sub;
+  const { body: { token } } = req;
+    try {
+        const findToken = await RefreshToken.findOne({ token: token });
+        if (token === undefined || token === null) {
+            return res.status(401).json({ message: "Refresh token is required" });
+        }
+        if (!findToken) {
+            return res.status(401).json({ message: "Invalid refresh token" });
+        }
 
-    const accessToken = createToken(user._id, user.role);
-    const refreshTokenValue = refreshToken(user._id, user.role);
+        jwt.verify(token, refreshsecrete, (err, decoded) => {
+            if (err) {
+                return res.status(401).json({ message: "Invalid refresh token" });
+            }
+            const newToken = createToken(decoded.id);
+            res.json({ token: newToken });
+        });
 
-    const existing = await RefreshToken.findOne({ userId: user._id });
-
-    if (!existing) {
-      const newToken = new RefreshToken({
-        userId: user._id,
-        role: user.role,
-        token: refreshTokenValue,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      });
-      await newToken.save();
-    } else {
-      await RefreshToken.findOneAndUpdate(
-        { userId: user._id },
-        { token: refreshTokenValue, role: user.role, expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) },
-        { new: true }
-      );
+    } catch (err) {
+        res.status(500).json({ message: "Server Error", error: err.message });
     }
-    return res.json({
-      status: true,
-      message: "success",
-      data: {
-        accessToken,
-        refreshToken: refreshTokenValue,
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ status: false, message: "Token generation failed" });
-  }
 };
 export const logout = async (req, res) => {
-  try {
-    const userId = req.user.sub?._id || req.user.sub;
-    const role = req.user.role;
-
-    const deleted = await RefreshToken.findOneAndDelete({ userId, role, token });
-
-    if (!deleted) {
-      return res.status(400).json({ message: "No active session found or already logged out" });
+  const { body: { token } } = req;
+    try {
+        if (!token) {
+            return res.status(401).json({ message: "Refresh token is required" });
+        }
+        await RefreshToken.deleteOne({ refreshtoken: token });
+        res.json({ message: "Logged out successfully" });
+    } catch (err) {
+        res.status(500).json({ message: "Server Error" });
     }
-
-    return res.status(200).json({ message: "Logged out successfully" });
-  } catch (error) {
-    console.error("Logout error:", error);
-    return res.status(500).json({ message: "Failed to logout. Internal server error" });
-  }
 };
