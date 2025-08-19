@@ -17,6 +17,11 @@ const ProductSchema = new mongoose.Schema ({
         type: mongoose.Schema.Types.String,
         required: true
     },
+    vendorId:{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
     imageurl: {
         type: mongoose.Schema.Types.String,
     },

@@ -267,6 +267,38 @@ components:
           type: string
           format: date-time
           readOnly: true
+    Delivery:
+      type: object
+      required:
+        - address
+        - recipientName
+        - recipientPhone
+      properties:
+        address:
+          type: string
+          example: "456 Elm St, Yaoundé, Centre, 10002, Cameroon"
+        recipientName:
+          type: string
+          example: "Jane Doe"
+        recipientPhone:
+          type: string
+          example: "+237 6 12 34 56 78"
+        status:
+          type: string
+          enum: [pending, shipped, delivered, cancelled]
+          default: pending
+        orderId:
+          type: string
+          format: uuid
+          description: ID of the associated order
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
 paths:
   #products API
   /api/products/:
@@ -1039,3 +1071,93 @@ paths:
           description: Category not found
         500:
           description: Error deleting products by category
+  /api/deliveries/:
+    get:
+      summary: Get all deliveries
+      description: Retrieve a list of all deliveries
+      responses:
+        200:
+          description: Deliveries found
+        404:
+          description: No deliveries found
+        500:
+          description: Server error
+    post:
+      summary: Create a delivery
+      description: Create a new delivery record
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Delivery"
+      responses:
+        201:
+          description: Delivery created
+        400:
+          description: Bad request
+        500:
+          description: Server error
+
+  /api/deliveries/{id}:
+    get:
+      summary: Get delivery details
+      description: Retrieve details of a specific delivery by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Delivery ID
+          schema:
+            type: string
+      responses:
+        200:
+          description: Delivery found
+        404:
+          description: Delivery not found
+        500:
+          description: Server error
+    patch:
+      summary: Update delivery status
+      description: Update the status of a specific delivery
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Delivery ID
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  enum: [pending, shipped, delivered, cancelled]
+      responses:
+        200:
+          description: Delivery status updated
+        404:
+          description: Delivery not found
+        500:
+          description: Server error
+    delete:
+      summary: Delete a delivery
+      description: Delete a specific delivery by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: Delivery ID
+          schema:
+            type: string
+      responses:
+        200:
+          description: Delivery deleted
+        404:
+          description: Delivery not found
+        500:
+          description: Server error
