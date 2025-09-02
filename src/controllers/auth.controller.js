@@ -5,6 +5,10 @@ import { createToken, createrefreshToken} from "../config/jwt.js";
 import { RefreshToken } from "../models/RefreshToken.model.js";
 import jwt from "jsonwebtoken";
 import { refreshsecrete } from "../config/env.config.js";
+import crypto from "crypto";
+import { sendEmail } from "../utils/sendemail.js";
+import { base_url } from "../config/env.config.js";
+import { Token } from "../models/Token.model.js";
 
 export const registerUser = async (req, res) => {
     const result = validationResult(req);
@@ -14,10 +18,13 @@ export const registerUser = async (req, res) => {
     console.log(body.password);
     try {
     
-         const user = new User({...body, password: hashedPassword})
-         await user.save().then((user) => {
+         const user = new User({...body, password: hashedPassword});
+         await user.save().then(async (user) => {
+            const verificationToken = await new Token({ userId: user._id, usertoken: crypto.randomBytes(32).toString("hex") }).save();
             console.log("User created,", user.toJSON());
-            return res.status(201).json(user)
+            const url = `${base_url}api/auth/verifyEmail/${verificationToken.usertoken}`;
+            sendEmail(user.email, "Verify your email", `Click the link to verify your email: ${url}`);
+            return res.status(201).json(user, { message: "An Email sent to your account please verify" });
         }).catch((err) => {
             console.error("Error creating user:", err);
             return res
@@ -42,6 +49,15 @@ export const loginUser = async (req, res) => {
         const isMatch = comparePassword(password, user.password);
         if (!isMatch) {
             return res.status(401).json({ message: "Invalid credentials" });
+        }
+        if (!user.verified) {
+            let uservertoken = await Token.findOne({ userId: user._id });
+            if (!uservertoken) {
+                uservertoken = await new Token({ userId: user._id, usertoken: crypto.randomBytes(32).toString("hex") }).save();
+                const url = `${base_url}api/auth/verifyEmail/${uservertoken.usertoken}`;
+                await sendEmail(user.email, "Verify your email", `Click the link to verify your email: ${url}`);
+            }
+            return res.status(401).json({ message: "Email not verified. Please verify your email to login." });
         }
         const token = createToken(user._id, user.role);
         const refreshToken = createrefreshToken(user._id, user.role);
@@ -92,3 +108,17 @@ export const logout = async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 };
+export const verifyEmail = async (req, res) => {
+    const { params: { token } } = req;
+    try {
+        const verificationToken = await Token.findOne({ usertoken: token });
+        if (!verificationToken) {
+            return res.status(404).json({ message: "Invalid or expired token" });
+        }
+        await User.updateOne({ _id: verificationToken.userId }, { verified: true });
+        await Token.deleteOne({ _id: verificationToken._id });
+        res.json({ message: "Email verified successfully" });
+    } catch (err) {
+        res.status(500).json({ message: "Server Error", error: err.message });
+    }
+}

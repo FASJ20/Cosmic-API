@@ -16,6 +16,7 @@ import helmet from "helmet";
 import cors from "cors"
 import Stripe from 'stripe';
 import { stripe_secrete_key } from "./config/env.config.js";
+import verifyEmailRouter from "./routes/auth.route.js";
 // import apiKeyAuth from "./middleware/apiKeyAuth";
 
 const stripe = new Stripe(stripe_secrete_key);
@@ -52,6 +53,7 @@ app.use("/api/users/me", userRouter);
 app.use("/api/wishlist", wishlistRouter);
 app.use("/api/categories", categoriesRouter);
 app.use("/api/deliveries", deliveryRouter);
+app.use("/api/verify", verifyEmailRouter);
 app.get("/", (req, res) => {
     res.status(200).json({ message: "Welcome to the API" });
 });
